@@ -5,7 +5,7 @@ This script creates redis cluster ( with master nodes only )
 **bash createrediscluster.sh version port ip[,ip...]**
 
 # Assumptions and cavets
-1. you have created redis servers aware of the version, port and ip addresses
+1. you have created redis servers and you're aware of the *version, port and ip addresses*
 2. you want to create a cluster with just masters (no redundancy)
 
 # Things to fix:
