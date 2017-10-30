@@ -120,3 +120,19 @@ Debugging commands
     #Failover election won: I'm the new master.
 
     - Basically clients connected to the master we are failing over are stopped. At the same time the master sends its replication offset to the slave, that waits to reach the offset on its side. When the replication offset is reached, the failover starts, and the old master is informed about the configuration switch. When the clients are unblocked on the old master, they are redirected to the new master.
+
+
+#TROUBLESHOOTING and fixing slave issues
+- We want the slaves to be equally distributed amongst the master i.e. Each master should have 2 slaves in different zones but sometimes, the master will be in failed state(blame openstack). What this means is that the failover takes places and one of the slaves attached to the failed master is promoted to master. Now the new master will have just one slave as shown below. Also when we restart the server (failed master), it will start as slave and may or may not join the previous master. In this scenario, we will have a master that has 1 slave and another master that has 3 slaves. The topology needs to be balanced.
+
+    -  Select a slave (based on zone) to be detached from the master having 3 slaves
+    - Login to the slave and run 'redis-cli CLUSTER RESET' - This command will take time as it removes the slave from the cluster and also flushes the DB. 
+    - Once the command completes, run 'redis-cli cluster info' and it will return a master with no slaves ( not connected to any cluster )
+    - Login to the master and find 'redis-trib.rb' tool. COMMAND: find / -type d -name "*redis-3.2.8*" -print 2>/dev/null
+    - Run './redis-trib.rb add-node --slave 10.36.189.135:6379 10.36.183.191:6379' where thrid IP and port is the slave that we detached above and fourth is master where we are running this command
+    - You will see the following after running ^^
+
+    - On Master run 'redis-cli cluster nodes | grep myself' to get the nodeID
+    - On Slave run 'redis-cli CLUSTER REPLICATE nodeID'  where nodeID is that of the master obtained above.
+    - The above command will return OK after completion.
+    - In the Kibana graph you will see that the number of slaves on all the nodes (masters) in the cluster is 2.
