@@ -10,7 +10,8 @@ This script creates redis cluster ( with master nodes only )
 
 # Things to fix:
 - get the location of /redis<version>/src (Line 34: # Run `find / -type d -name "*redis-3.2.8*" -print 2>/dev/null` to find the folder where redis-3.2.8 is installed)
-- Add ability to add slaves to the master
+- Add ability to add slaves to the master. 
+    - *Currently I'm adding the slaves manually by using redis-trib.rb add-node --slave <slaveIP:port> <masterIP:port>*
 
 # TEST performed: 
 ## *Assuming there are 2 slaves attached to a single master. In my setup, I had 9 masters and each had 2 slaves ( Total of 27 servers)*
